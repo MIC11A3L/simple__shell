@@ -1,78 +1,62 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef SHELL
+#define SHELL
 
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <wait.h>
+#include <fcntl.h>
+#include <dirent.h>
 #include <signal.h>
 
-#define SEP_SLASH "/"
-#define SEP_EQUAL "="
-#define SEP_TPOIN ":"
-#define SEP_ESPAC " \t\r\n\a"
-#define TITLE_PATH "PATH"
-#define TITLE_DIR "PWD"
-#define TITLE_FILE "_"
-
 /**
- * struct built_t - anothers commands.
- * @comand: command.
- * @func: function to executing.
+ * struct list - linked list for environmental variables
+ * @var: holds environmental variable string
+ * @next: points to next node
  */
-typedef struct built_t
+typedef struct list
 {
-	char *comand;
-	int (*func)(char *, char **, char *, char **, int, int);
-} built;
+	char *var;
+	struct list *next;
 
-/* Interactive mode */
-void func_loop(char **environ, char *argv);
-int check_string(char *str, ssize_t length);
+} list_t;
 
-/* no-Interactive mode */
-void no_interactive(char **environ, char *file);
-int arguments1(char *file, char **environ, char *s, int out);
-int check_string1(char *str, ssize_t length);
-
-/* Arguments configuration */
-int arguments(char *s, char *file, char **environ, int count, int out);
-int get_command(char *s, char **av, char *fl, char **env, int count, int out);
-
-/* Commands structure */
-int (*builtin(char *s))(char *, char **, char *, char **, int, int);
-int ex(char *s, char **argv, char *file, char **environ, int count, int out);
-int envir(char *s, char **av, char *fl, char **env, int count, int out);
-
-/* Commands search in the path */
-int search_command(char **argv, char *file, char **environ, int count);
-int divpath(char **argv, char *file, char **environ, int count);
-char *_getenv(char **environ, char *path);
-char *check_exec(char *path, char *command);
-
-/* Strings functions */
-int _strlen(char *s);
-char *_strcpy(char *dest, char *src);
-void _strcat(char *dest, char *src);
-int _strcmp(char *s1, char *s2);
-
-/* Numbers functions */
-int _isdigit(char c);
-int _atoi(char *s);
-
-/* Alloc Memory */
+/* function prototypes */
+int prompt(char **env);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-void _memcpy(char *dest, char *src, unsigned int n);
-
-/* Print functions */
-void _putchar(char *c);
-void newline(int number);
-void printerror(char *file, char *argv, int count, char *message);
-void printnumber(int number);
-void printerrorex(char *file, char **argv, int count, char *message);
+size_t get_line(char **str);
+int t_strlen(char *str, int pos, char delm);
+char *ignore_space(char *str);
+char **_str_tok(char *str, char *delm);
+char **c_str_tok(char *str, char *delm);
+char *_strcat(char *dest, char *src);
+char *_strdup(char *str);
+char *_strcpy(char *dest, char *src);
+int _strcmp(char *s1, char *s2);
+int _cd(char **str, list_t *env, int num);
+int built_in(char **token, list_t *env, int num, char **command);
+void non_interactive(list_t *env);
+char *_which(char *str, list_t *env);
+int __exit(char **s, list_t *env, int num, char **command);
+int _execve(char *argv[], list_t *env, int num);
+void free_double_ptr(char **str);
+void free_linked_list(list_t *list);
+int _env(char **str, list_t *env);
+char *get_env(char *str, list_t *env);
+list_t *env_linked_list(char **env);
+list_t *add_end_node(list_t **head, char *str);
+size_t print_list(list_t *h);
+int delete_nodeint_at_index(list_t **head, int index);
+int _unsetenv(list_t **env, char **str);
+int _setenv(list_t **env, char **str);
+int find_env(list_t *env, char *str);
+void not_found(char *str, int num, list_t *env);
+void cant_cd_to(char *str, int c_n, list_t *env);
+void illegal_number(char *str, int c_n, list_t *env);
+char *int_to_string(int num);
 
 #endif
